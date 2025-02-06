@@ -1,0 +1,45 @@
+- id: tflint
+  name: Run tflint (terraform linter)
+  files: ^ci/terraform/
+  require_serial: true
+  pass_filenames: true
+  types_or:
+    - hcl
+    - terraform
+  language: golang
+  additional_dependencies:
+    - github.com/terraform-linters/tflint@v0.55.0
+  entry: scripts/tflint.sh
+  args:
+    - --minimum-failure-severity=warning
+- id: shfmt
+  name: shfmt (format shell scripts)
+  pass_filenames: true
+  language: golang
+  additional_dependencies:
+    - mvdan.cc/sh/v3/cmd/shfmt@v3.8.0
+  entry: shfmt -w -s -l
+  types:
+    - file
+    - shell
+  exclude_types:
+    - zsh
+- id: prettier
+  name: Run prettier
+  language: node
+  additional_dependencies: ["prettier@3.4.2"]
+  types: [text]
+  entry: prettier --write --ignore-unknown
+  pass_filenames: true
+- id: tfupdate-lock
+  name: Update terraform provider locks
+  files: "/versions.tf$"
+  pass_filenames: false
+  types:
+    - file
+  language: golang
+  additional_dependencies:
+    - github.com/minamijoyo/tfupdate@v0.8.5
+  entry: scripts/tfupdate-lock.sh
+  args:
+    - ci/terraform
